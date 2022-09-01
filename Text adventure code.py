@@ -1,27 +1,42 @@
 ### Helper functions for displaying rooms ###
 
+room_0_items = ["flashlight"]
+room_1_items = ["key"]
+room_2_items = []
+room_3_items = []
+
 
 def show_room_0():
     """Display the contents of room 0."""
     print("You are in an empty room with white walls.")
     print("Theres a door to your west.")
     print('if you need help type "help"')
- 
+    for objects in room_0_items:
+        print("Items available in this room")
+        print(objects)
+
 def show_room_1():
     """Display the contents of room 1."""
     print("You are in an empty hallway, but you see a shiny key laying in the corner")
     print("There's a staircase to your north")
+    for objects in room_1_items:
+        print(objects)
 
 def show_room_2():
     """Display the contents of room 2."""
     print("You are in an empty hallway on the second floor.")
     print("There's a locked room to your east")
+    for objects in room_2_items:
+        print(objects)
 
 def show_room_3():
     """Display the contents of room 3"""
     print("You've unlocked the door.")
     print("In front of you there is a table, chairs and security cameras")
     print("There's an open window to your east")
+    print(room_3_items)
+
+
 
 def move_from_room_0(direction):
     """ Room 0 only has a single exit , which leads north to room 1. """
@@ -48,16 +63,12 @@ def move_from_room_1(direction):
         print("It is not possible to go in that direction")
         return 1
     
-def move_from_room_2(direction, has_key):
-    if direction == "east": 
-        if has_key == True:
-            print("You have unlocked the door to the security room")
-            print("In front of you there is a table, chairs and security cameras")
-            print("There's an open window to your east")
-            return 3
-        else:
-            print("You cannot go in that direction without the key")
-            return 2
+def move_from_room_2(direction):
+    if direction == "east":
+        print("You have unlocked the door to the security room")
+        print("In front of you there is a table, chairs and security cameras")
+        print("There's an open window to your east")
+        return 3
     elif direction == "west":
         print("You are in an empty hallway, but you see a shiny key laying in the corner")
         print("There's a staircase to your north-west")
@@ -95,36 +106,35 @@ def show_room(room_num):
     else:
         print("You are out of bounds. Room", room_num, "does not exist.")
 
+def get_room_items(current_room):
+    """Find the list of items in the room."""
+    if current_room == 0:
+        return room_0_items
+    elif current_room == 1:
+        return room_1_items
+    elif current_room == 2: 
+        return room_2_items 
+    elif current_room == 3:
+        return room_3_items
+
 ### The main game loop ###
 
 def game_loop():
     """Main loop of the game - this is where the fun happens."""
 
+
     # We start in room 0
     current_room = 0
-    has_key = False
-    key_count = 0
-
+    inventory = []
     # Display the room that we start in
     show_room(current_room)
-
+    
     # Enter the main loop, where the user can input commands.
     while True:
         user_inp = input("> ")
-        
+
         if user_inp == "look":
             show_room(current_room) 
-        elif user_inp == "grab key":
-            if has_key == True:
-                print ("you have the key already")
-            elif user_inp == "grab key":
-                if current_room == 1: 
-                    has_key = True
-                    key_count = 1
-                    print ("you have grabbed the key")
-            else: 
-                if current_room == 0 or current_room == 2 or current_room == 3:
-                    print ("No key here.")
         elif user_inp == "help":
             print('"look" gives a short presentation of the current room')
             print('"grab" u can use the grab command to grab an item')
@@ -133,15 +143,66 @@ def game_loop():
             print('"west" you move west from your current position')
             print('"north" you move north from your current position')
             print('"quit" you can only use quit if you wish to exit the game')
-        elif user_inp == "west" or user_inp == "north" or user_inp == "east" or user_inp == "south":
+            print('"items" view the items that are available in your current room')
+        elif user_inp[:4] == "grab":
+            items = get_room_items(current_room)
+            item = user_inp [5:]
+            if item in items:
+                if item == "flashlight":
+                    inventory.append(item)
+                    print("you have grabed", item)
+                    items.remove(item)
+                elif "flashlight" in inventory:
+                    inventory.append(item)
+                    print("you have grabed", item)
+                    items.remove(item)
+                else:
+                    print("it's to dark to see the", item)
+            elif item in inventory:
+                print("you already have the", item)
+            else:
+                print("you couldn't find the", item)
+        elif user_inp[:4] == "drop":
+            items = get_room_items(current_room)
+            item = user_inp [5:]
+            if item in inventory:
+                items.append(item)
+                print("you have dropped", item)
+                inventory.remove(item)
+            elif item in inventory:
+                print("you don't have the", item)
+            else:
+                print("you couldn't find the", item, "in your inventory")
+        elif user_inp == "items":
             if current_room == 0:
-                current_room = move_from_room_0(user_inp)
+                print(room_0_items)
             elif current_room == 1:
-                current_room = move_from_room_1(user_inp)    
+                print(room_1_items)
             elif current_room == 2:
-                current_room = move_from_room_2(user_inp, has_key)
+                print(room_2_items)
             elif current_room == 3:
-                current_room = move_from_room_3(user_inp)                
+                print(room_3_items)
+        elif user_inp == "west" or user_inp == "north" or user_inp == "east" or user_inp == "south":
+            if "flashlight" in inventory:
+                if current_room == 0:
+                    current_room = move_from_room_0(user_inp)
+                elif current_room == 1:
+                    current_room = move_from_room_1(user_inp)
+                elif current_room == 2:
+                    if user_inp == "east":
+                        if "key" in inventory:
+                            current_room = move_from_room_2(user_inp)
+                        else:
+                            print("You cannot go in that direction without the key")
+                    else:
+                        current_room = move_from_room_2(user_inp)
+                elif current_room == 3:
+                    current_room = move_from_room_3(user_inp)
+                    if user_inp == "east":
+                        break 
+            else:
+                print("you couldn't find the way to go because it's to dark")
+                pass 
         elif user_inp == "quit":
             return
         else:
