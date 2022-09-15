@@ -21,55 +21,52 @@ async def on_ready():
 
 ### Helper functions for displaying rooms ###
 
+item_room_0 = ["flashlight"]
+item_room_1 = ["key"]
+item_room_2 = [""]
+item_room_3 = [""]
+item_inventory = [""]
+
+
 Items = {
-    "key" : "1",
-    "flashlight" : "0"
+    0 : item_room_0,
+    1 : item_room_1,
+    2 : item_room_2,
+    3 : item_room_3,
+    "inventory" : item_inventory
 }
 
-def show_room_0():
-    """Display the contents of room 0."""
-    reply = ["You are in an empty room with white walls.",
-    "Theres a door to your west.",
-    'if you need help type "help"',
-    "Items available in this room",
-    list(Items.keys())[list(Items.values()).index("0")]]
-    return reply
-     
-      
+class room:
+    def __init__(self,name,surroundings,object):
+        self.name = name
+        self.surroundings = surroundings
+        self.object = object
+        
 
-    
-    
+    def show(self):
+        print(self.name + "description:", self.surroundings, self.object )
 
-def show_room_1():
-    """Display the contents of room 1."""
-    reply = ["You are in an empty hallway, but you see a shiny key laying in the corner",
-    "There's a staircase to your north"
-    (list(Items.keys())[list(Items.values()).index("1")])]
-    return reply
-    
+room_0 = room("cell", "You are in an empty room with white walls."
+    "Theres a door to your west."
+    'if you need help type "help"'
+    "Items available in this room", list(Items.values())[list(Items.keys()).index("0")])
 
-def show_room_2():
-    reply = ["""Display the contents of room 2.""",
-    "You are in an empty hallway on the second floor.",
-    "There's a locked room to your east",
-    list(Items.keys())[list(Items.values()).index("2")]]
-    return reply
+room_1 = room("hallway 1", "You are in an empty hallway, but you see a shiny key laying in the corner"
+    "There's a staircase to your north", list(Items.values())[list(Items.keys()).index("1")])
 
-def show_room_3():
-    """Display the contents of room 3"""
-    reply = ["You've unlocked the door.",
-    "In front of you there is a table, chairs and security cameras",
-    "There's an open window to your east",
-    list(Items.keys())[list(Items.values()).index("3")]]
-    return reply
+room_2 = room("hallway 2", "Display the contents of room 2."""
+    "You are in an empty hallway on the second floor."
+    "There's a locked room to your east", list(Items.values())[list(Items.keys()).index("2")])
 
+room_3 = room("Guard room", "You've unlocked the door."
+    "In front of you there is a table, chairs and security cameras"
+    "There's an open window to your east", list(Items.values())[list(Items.keys()).index("3")])
 
 
 def move_from_room_0(direction):
     """ Room 0 only has a single exit , which leads north to room 1. """
     if direction == "west": 
-        print("You are in an empty hallway, but you see a shiny key laying in the corner")
-        print("There's a staircase to your north")
+        print([room_1])
         return 1
     else:
         print("It is not possible to go in that direction")
@@ -77,14 +74,10 @@ def move_from_room_0(direction):
 
 def move_from_room_1(direction):
     if direction == "north": 
-        "You have climbed the stairs to the 2nd floor",
-        "You are in an empty hallway on the second floor.",
-        "There's a locked room to your east"
+        print([room_2])
         return 2
     elif direction == "east":  
-        "You returned to your cell",
-        "You are in an empty room with white walls.",
-        "Theres a door to your west."
+        print([room_0])
         return 0
     else: 
         print("It is not possible to go in that direction")
@@ -92,13 +85,10 @@ def move_from_room_1(direction):
     
 def move_from_room_2(direction):
     if direction == "east":
-        "You have unlocked the door to the security room",
-        "In front of you there is a table, chairs and security cameras"
-        "There's an open window to your east"
+        print([room_3])
         return 3
     elif direction == "west":
-        print("You are in an empty hallway, but you see a shiny key laying in the corner")
-        print("There's a staircase to your north-west")
+        print([room_1])
         return 1
     else: 
         print("It is not possible to go in that direction")
@@ -109,9 +99,7 @@ def move_from_room_3(direction):
         print("Congratulations you have escaped from prison")
         return
     if direction == "west": 
-        ["you have returnd to the halway",
-        "You are in an empty hallway on the second floor.",
-        "There's a locked room to your east"]
+        print([room_2])
         return 2
     else: 
         print("you can not go in that direction")
@@ -123,13 +111,13 @@ def show_room(room_num):
     - room_num : int, the number of the room to show.
     """
     if room_num == 0:
-        show_room_0()
+        print([room_0])
     elif room_num == 1: 
-        show_room_1()
+        print([room_1])
     elif room_num == 2:
-        show_room_2()
+        print([room_2])
     elif room_num == 3:
-        show_room_3()
+        print([room_3])
     else:
         reply = "You are out of bounds. Room", room_num, "does not exist."
         return reply
@@ -138,13 +126,13 @@ def show_room(room_num):
 def get_room_items(current_room):
     """Find the list of items in the room."""
     if current_room == 0:
-        return list(Items.keys())[list(Items.values()).index("0")]
+        return list(Items.values())[list(Items.keys()).index(0)]
     elif current_room == 1:
-        return list(Items.keys())[list(Items.values()).index("1")]
+        return list(Items.values())[list(Items.keys()).index(1)]
     elif current_room == 2: 
-        return list(Items.keys())[list(Items.values()).index("2")]
+        return list(Items.values())[list(Items.keys()).index(2)]
     elif current_room == 3:
-        return list(Items.keys())[list(Items.values()).index("3")]
+        return list(Items.values())[list(Items.keys()).index(3)]
 
 ### The main game loop ###
 
@@ -188,7 +176,7 @@ async def on_message(message):
       Items[item] = str(current_room)
       print("You have dropped the", item)
     elif contents.startswith("!inventory"):
-      print(list(Items.keys())[list(Items.values()).index("inventory")])
+      print(list(Items.values())[list(Items.keys()).index("inventory")])
     elif contents.startswith("!walk"):
       direction = contents[6:]
       print(direction)
