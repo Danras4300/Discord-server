@@ -165,13 +165,15 @@ async def on_message(message):
             Items["inventory"].append(item)
             reply = "You have grabbed this item: " + item
             await message.channel.send(reply)
-          elif list(Items.values())[list(Items.keys()).index(item)] == "inventory": #Fix her fra
-            reply = "You already have this item: " + item
-            await message.channel.send(reply)
-          elif Items["flashlight"] != "inventory": 
+          elif Items["inventory"] != "flashlight": 
             reply = "It's too dark to see without flashlight"
             await message.channel.send(reply)
-        elif list(Items.values())[list(Items.keys()).index(item)] == "inventory":
+        elif item == Items[str(current_room)][n]:
+            Items[str(current_room)].remove(item)
+            Items["inventory"].append(item)
+            reply = "You have grabbed this item: " + item
+            await message.channel.send(reply)
+        elif item == Items["inventory"][n]:
             reply = "You already have this item: " + item
             await message.channel.send(reply)
         else:
@@ -179,33 +181,40 @@ async def on_message(message):
           await message.channel.send(reply)
     elif contents.startswith("!drop"):
       item = contents[5:]
-      Items[item] = str(current_room)
-      reply = "You have dropped the " + item 
-      await message.channel.send(reply) #Fix her til
+      print(item)
+      for n in range(0,len(Items["inventory"])):
+        if item == Items["inventory"][n]:
+            Items["inventory"].remove(item)
+            Items[str(current_room)].append(item)
+            reply = "You have dropped this item: " + item
+            await message.channel.send(reply)
     elif contents.startswith("!inventory"):
-      print(list(Items.values())[list(Items.keys()).index("inventory")])
+      for n in range(0,len(Items["inventory"])):
+        reply = n
+        await message.channel.send(reply)
     elif contents.startswith("!walk"):
       direction = contents[6:]
       print(direction)
-      if Items["inventory"] == "flashlight": #FIXXXXXXXXXXXXXxx
-        if current_room == 0:
-          current_room = move_from_room_0(direction)
-        elif current_room == 1:
-          current_room = move_from_room_1(direction)
-        elif current_room == 2: 
-          if direction == "east":
-            if Items["key"] == "inventory":
-              current_room = move_from_room_2(direction)
+      for n in range(0,len(Items["inventory"])):
+        if n == "flashlight":
+          if current_room == 0:
+            current_room = move_from_room_0(direction)
+          elif current_room == 1:
+            current_room = move_from_room_1(direction)
+          elif current_room == 2: 
+            if direction == "east":
+              if n == "key":
+                current_room = move_from_room_2(direction)
+              else: 
+                reply = "You can't unlock the door without the key"
+                await message.channel.send(reply)
             else: 
-              reply = "You can't unlock the door without the key"
+              current_room = move_from_room_2(direction)
+          elif current_room == 3: 
+            current_room = move_from_room_3(direction)
+            if direction == "east":
+              reply = "You have escaped prison!"
               await message.channel.send(reply)
-          else: 
-            current_room = move_from_room_2(direction)
-        elif current_room == 3: 
-          current_room = move_from_room_3(direction)
-          if direction == "east":
-            reply = "You have escaped prison!"
-            await message.channel.send(reply)
       else: 
         reply = "It's too dark to move"
         await message.channel.send(reply)
