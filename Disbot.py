@@ -66,43 +66,43 @@ room_3 = room("Guard room ", "You've unlocked the door. "
 def move_from_room_0(direction):
     """ Room 0 only has a single exit , which leads north to room 1. """
     if direction == "west": 
-        print([room_1])
+        #print([room_1])
         return 1
     else:
-        print("It is not possible to go in that direction")
+        #print("It is not possible to go in that direction")
         return 0
 
 def move_from_room_1(direction):
     if direction == "north": 
-        print([room_2])
+        #print([room_2])
         return 2
     elif direction == "east":  
-        print([room_0])
+        #print([room_0])
         return 0
     else: 
-        print("It is not possible to go in that direction")
+        #print("It is not possible to go in that direction")
         return 1
     
 def move_from_room_2(direction):
     if direction == "east":
-        print([room_3])
+        #print([room_3])
         return 3
     elif direction == "west":
-        print([room_1])
+        #print([room_1])
         return 1
     else: 
-        print("It is not possible to go in that direction")
+        #print("It is not possible to go in that direction")
         return 2
 
 def move_from_room_3(direction):
     if direction == "east":
-        print("Congratulations you have escaped from prison")
+        #print("Congratulations you have escaped from prison")
         return
     if direction == "west": 
-        print([room_2])
+        #print([room_2])
         return 2
     else: 
-        print("you can not go in that direction")
+        #print("you can not go in that direction")
         return 3
 
 def show_room(room_num):
@@ -113,11 +113,11 @@ def show_room(room_num):
     if room_num == 0:
         return room_0.show()
     elif room_num == 1: 
-        print([room_1])
+        return room_1.show()
     elif room_num == 2:
-        print([room_2])
+        return room_2.show()
     elif room_num == 3:
-        print([room_3])
+        return room_3.show()
     else:
         reply = "You are out of bounds. Room", room_num, "does not exist."
         return reply
@@ -196,8 +196,9 @@ async def on_message(message):
       direction = contents[6:]
       print(direction)
       for n in range(0,len(Items["inventory"])):
-        print(n)
-        if n == "flashlight":
+        print(Items["inventory"][0])
+        x = Items["inventory"][n]
+        if x == "flashlight":
           if current_room == 0:
             current_room = move_from_room_0(direction)
           elif current_room == 1:
