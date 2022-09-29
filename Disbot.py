@@ -168,7 +168,7 @@ async def on_message(message):
           elif Items["inventory"] != "flashlight": 
             reply = "It's too dark to see without flashlight"
             await message.channel.send(reply)
-        elif item == Items[str(current_room)][n]:
+          elif item == Items[str(current_room)][n]:
             Items[str(current_room)].remove(item)
             Items["inventory"].append(item)
             reply = "You have grabbed this item: " + item
@@ -196,6 +196,7 @@ async def on_message(message):
       direction = contents[6:]
       print(direction)
       for n in range(0,len(Items["inventory"])):
+        print(n)
         if n == "flashlight":
           if current_room == 0:
             current_room = move_from_room_0(direction)
