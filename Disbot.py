@@ -57,7 +57,7 @@ class room:
 
 room_0 = room("Cell ", "You are in an empty room with white walls. "
     "Theres a door to your west. "
-    'if you need help type "help "'
+    'If you need help type "!help" '
     "Items available in this room ", list(Items.values())[list(Items.keys()).index("0")])
 
 room_1 = room("Hallway 1 ", "You are in an empty hallway, but you see a shiny key laying in the corner "
@@ -75,43 +75,32 @@ room_3 = room("Guard room ", "You've unlocked the door. "
 def move_from_room_0(direction):
     """ Room 0 only has a single exit , which leads north to room 1. """
     if direction == "west": 
-        #print([room_1])
         return 1
     else:
-        #print("It is not possible to go in that direction")
         return 0
 
 def move_from_room_1(direction):
     if direction == "north": 
-        #print([room_2])
         return 2
     elif direction == "east":  
-        #print([room_0])
         return 0
     else: 
-        #print("It is not possible to go in that direction")
         return 1
     
 def move_from_room_2(direction):
     if direction == "east":
-        #print([room_3])
         return 3
     elif direction == "west":
-        #print([room_1])
         return 1
     else: 
-        #print("It is not possible to go in that direction")
         return 2
 
 def move_from_room_3(direction):
     if direction == "east":
-        #print("Congratulations you have escaped from prison")
         return
     if direction == "west": 
-        #print([room_2])
         return 2
     else: 
-        #print("you can not go in that direction")
         return 3
 
 def show_room(room_num):
@@ -179,11 +168,11 @@ async def on_message(message):
                 Items["inventory"].append(item)
                 reply = "You have grabbed this item: " + item
                 await message.channel.send(reply)
-        elif item in Items["inventory"]: #Virker ikk
+        elif item in Items["inventory"]: 
             reply = "You already have this item: " + item
             await message.channel.send(reply)
         else:
-          reply = "unable to find: ", item #virker ikk
+          reply = "unable to find: ", item 
           await message.channel.send(reply)
     elif contents.startswith("!drop"):
       item = contents[6:]
@@ -227,32 +216,6 @@ async def on_message(message):
       else:
         reply = "Its too dark to move"
         await message.channel.send(reply)
-    
-
-      #   print(Items["inventory"][0])
-      #   x = Items["inventory"][n]
-      #   if x == "flashlight":
-      #     if current_room == 0:
-      #       current_room = move_from_room_0(direction)
-      #     elif current_room == 1:
-      #       current_room = move_from_room_1(direction)
-      #     elif current_room == 2: 
-      #       if direction == "east":
-      #         if n == "key":
-      #           current_room = move_from_room_2(direction)
-      #         else: 
-      #           reply = "You can't unlock the door without the key"
-      #           await message.channel.send(reply)
-      #       else: 
-      #         current_room = move_from_room_2(direction)
-      #     elif current_room == 3: 
-      #       current_room = move_from_room_3(direction)
-      #       if direction == "east":
-      #         reply = "You have escaped prison!"
-      #         await message.channel.send(reply)
-      # else: 
-      #   reply = "It's too dark to move"
-      #   await message.channel.send(reply)
     else:
       pass
 
