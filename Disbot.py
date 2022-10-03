@@ -21,20 +21,26 @@ async def on_ready():
 
 ### Helper functions for displaying rooms ###
 
+#Lister
+
 item_room_0 = ["flashlight"]
 item_room_1 = ["key"]
 item_room_2 = []
 item_room_3 = []
 item_inventory = []
 
+#Dictionaries
 
 Items = {
-    "0" : item_room_0,
+    "0" : item_room_0, 
     "1" : item_room_1,
     "2" : item_room_2,
     "3" : item_room_3,
     "inventory" : item_inventory
 }
+
+current_room = 0
+
 
 class room:
     def __init__(self,name,surroundings,object):
@@ -44,7 +50,9 @@ class room:
         
 
     def show(self):
-        return self.name + "description: " + self.surroundings + str(self.object) #kig på den næste gang (fejl besked)
+        return self.name + "description: " + self.surroundings + str(self.object) 
+
+#Klasser & objekter
 
 room_0 = room("Cell ", "You are in an empty room with white walls. "
     "Theres a door to your west. "
@@ -138,22 +146,19 @@ def get_room_items(current_room):
 
 @client.event
 async def on_message(message):
+    global current_room
     contents = message.content
     user = message.author.id
-  
-    current_room = 0
+    
     if contents.startswith("!look"):
       await message.channel.send(show_room(current_room)) 
     elif contents.startswith("!help"):
       reply = ['"!look" gives a short presentation of the current room',
                '"!grab" u can use the grab command to grab an item',
                '"!walk" lets you walk the direction you want (North, west, east, south)',
-               '"!east" you move east from your current position',
-               '"!south" you move south from your current position',
-               '"!west" you move west from your current position',
-               '"!north" you move north from your current position',
+               '"!drop" lets you drop the items you dont want',
                '"!quit" you can only use quit if you wish to exit the game',
-               '"!items" view the items that are available in your current room']
+               '"!items" view the items that are available in your inventory']
       await message.channel.send("\n".join(reply))
     elif contents.startswith("!grab"):
       item = contents[6:]
@@ -161,26 +166,28 @@ async def on_message(message):
       for n in range(0,len(Items[str(current_room)])):
         if item == Items[str(current_room)][n]:
           if item == "flashlight":
-            Items[str(current_room)].remove(item)
-            Items["inventory"].append(item)
+            Items[str(current_room)].remove(item) 
             reply = "You have grabbed this item: " + item
             await message.channel.send(reply)
           elif Items["inventory"] != "flashlight": 
-            reply = "It's too dark to see without flashlight"
+            reply = "It's too dark to see without flashlight" #Man kan ikk grab key i rum 1, man får dette besked selvom man har flashlight
             await message.channel.send(reply)
           elif item == Items[str(current_room)][n]:
             Items[str(current_room)].remove(item)
             Items["inventory"].append(item)
             reply = "You have grabbed this item: " + item
             await message.channel.send(reply)
-        elif item == Items["inventory"][n]:
+        elif item == Items["inventory"][n]: #Virker ikk
             reply = "You already have this item: " + item
             await message.channel.send(reply)
         else:
-          reply = "unable to find: ", item
+          reply = "unable to find: ", item #virker ikk
           await message.channel.send(reply)
-    elif contents.startswith("!drop"):
+    elif contents.startswith("!drop"): #Man kan drop et item men man kan ikke grab det igen
       item = contents[5:]
+      Items["inventory"].remove(item)
+      Items[str(current_room)].append(item)
+      reply = "You have dropped this item:" + item
       print(item)
       for n in range(0,len(Items["inventory"])):
         if item == Items["inventory"][n]:
@@ -189,37 +196,45 @@ async def on_message(message):
             reply = "You have dropped this item: " + item
             await message.channel.send(reply)
     elif contents.startswith("!inventory"):
-      for n in range(0,len(Items["inventory"])):
+      for n in Items["inventory"]:
         reply = n
         await message.channel.send(reply)
     elif contents.startswith("!walk"):
       direction = contents[6:]
       print(direction)
-      for n in range(0,len(Items["inventory"])):
-        print(Items["inventory"][0])
-        x = Items["inventory"][n]
-        if x == "flashlight":
-          if current_room == 0:
-            current_room = move_from_room_0(direction)
-          elif current_room == 1:
-            current_room = move_from_room_1(direction)
-          elif current_room == 2: 
-            if direction == "east":
-              if n == "key":
-                current_room = move_from_room_2(direction)
-              else: 
-                reply = "You can't unlock the door without the key"
-                await message.channel.send(reply)
-            else: 
-              current_room = move_from_room_2(direction)
-          elif current_room == 3: 
-            current_room = move_from_room_3(direction)
-            if direction == "east":
-              reply = "You have escaped prison!"
-              await message.channel.send(reply)
-      else: 
-        reply = "It's too dark to move"
+      
+      if "flashlight" in Items["inventory"]:
+        if current_room == 0:
+          current_room = move_from_room_0(direction)
+      else:
+        reply = "Its too dark to move"
         await message.channel.send(reply)
+        
+
+      #   print(Items["inventory"][0])
+      #   x = Items["inventory"][n]
+      #   if x == "flashlight":
+      #     if current_room == 0:
+      #       current_room = move_from_room_0(direction)
+      #     elif current_room == 1:
+      #       current_room = move_from_room_1(direction)
+      #     elif current_room == 2: 
+      #       if direction == "east":
+      #         if n == "key":
+      #           current_room = move_from_room_2(direction)
+      #         else: 
+      #           reply = "You can't unlock the door without the key"
+      #           await message.channel.send(reply)
+      #       else: 
+      #         current_room = move_from_room_2(direction)
+      #     elif current_room == 3: 
+      #       current_room = move_from_room_3(direction)
+      #       if direction == "east":
+      #         reply = "You have escaped prison!"
+      #         await message.channel.send(reply)
+      # else: 
+      #   reply = "It's too dark to move"
+      #   await message.channel.send(reply)
     else:
       pass
 
