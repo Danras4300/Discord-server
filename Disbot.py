@@ -1,3 +1,4 @@
+from pdb import Restart
 import discord
 
 intents = discord.Intents.default()
@@ -165,26 +166,27 @@ async def on_message(message):
       print(item)
       for n in range(0,len(Items[str(current_room)])):
         if item == Items[str(current_room)][n]:
-          if item == "flashlight":
-            Items[str(current_room)].remove(item) 
-            reply = "You have grabbed this item: " + item
-            await message.channel.send(reply)
-          elif Items["inventory"] != "flashlight": 
-            reply = "It's too dark to see without flashlight" #Man kan ikk grab key i rum 1, man får dette besked selvom man har flashlight
-            await message.channel.send(reply)
-          elif item == Items[str(current_room)][n]:
-            Items[str(current_room)].remove(item)
-            Items["inventory"].append(item)
-            reply = "You have grabbed this item: " + item
-            await message.channel.send(reply)
-        elif item == Items["inventory"][n]: #Virker ikk
+            if item == "flashlight":
+                Items[str(current_room)].remove(item) 
+                Items["inventory"].append(item)
+                reply = "You have grabbed this item: " + item
+                await message.channel.send(reply)
+            elif "flashlight" not in Items["inventory"]: 
+                reply = "It's too dark to see without flashlight" 
+                await message.channel.send(reply)
+            elif item == Items[str(current_room)][n]:
+                Items[str(current_room)].remove(item)
+                Items["inventory"].append(item)
+                reply = "You have grabbed this item: " + item
+                await message.channel.send(reply)
+        elif item in Items["inventory"]: #Virker ikk
             reply = "You already have this item: " + item
             await message.channel.send(reply)
         else:
           reply = "unable to find: ", item #virker ikk
           await message.channel.send(reply)
-    elif contents.startswith("!drop"): #Man kan drop et item men man kan ikke grab det igen
-      item = contents[5:]
+    elif contents.startswith("!drop"):
+      item = contents[6:]
       Items["inventory"].remove(item)
       Items[str(current_room)].append(item)
       reply = "You have dropped this item:" + item
@@ -202,14 +204,30 @@ async def on_message(message):
     elif contents.startswith("!walk"):
       direction = contents[6:]
       print(direction)
-      
       if "flashlight" in Items["inventory"]:
         if current_room == 0:
-          current_room = move_from_room_0(direction)
+            current_room = move_from_room_0(direction)
+        elif current_room == 1:
+            current_room = move_from_room_1(direction)
+        elif current_room == 2:
+            if direction == "east":
+                if "key" in Items["inventory"]:
+                    current_room = move_from_room_2(direction)
+                else: 
+                    reply = "You can't unlock the door without the key"
+                    await message.channel.send(reply)
+            else:
+                current_room = move_from_room_2(direction)
+        elif current_room == 3: 
+            current_room = move_from_room_3(direction)
+            if direction == "east":
+                reply = "You have escaped prison!"
+                await message.channel.send(reply)
+                Restart
       else:
         reply = "Its too dark to move"
         await message.channel.send(reply)
-        
+    
 
       #   print(Items["inventory"][0])
       #   x = Items["inventory"][n]
